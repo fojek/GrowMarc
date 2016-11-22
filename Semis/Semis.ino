@@ -1,11 +1,15 @@
 #include <PID_v1.h>
 #include "DHT.h"
+
+// 45, then 27, then 31
+int temperatures[4] = {45, 27, 31, 0};
+long temps[3] = {1000, 2000, 3000, 4000};
  
 #define DHTPIN 2     // what pin we're connected to
 #define DHTTYPE DHT22   // DHT 22  (AM2302)
-#define plancherChauffant 4 // Sortie relais pour le plancher
-#define soleil 5 // Sortie pour le soleil
+#define heater 5 // Sortie pour le soleil
 #define jour 76032 // Facteur .88
+
 DHT dht(DHTPIN, DHTTYPE);
 
 //Define Variables we'll be connecting to
@@ -15,26 +19,23 @@ double Setpoint, Input, Output;
 PID myPID(&Input, &Output, &Setpoint,250,5,1, DIRECT);
 
 int WindowSize = 5000;
-long temps, secondes;
 unsigned long windowStartTime;
-
+long seconds = 0;
+int etape = 0;
+  
 void setup() {
-  pinMode(plancherChauffant, OUTPUT);  
-  pinMode(soleil, OUTPUT);
+  pinMode(heater, OUTPUT);
   Serial.begin(9600); 
   dht.begin();
   
+
+  
   //initialize the variables we're linked to
   Input = analogRead(0);
-  Setpoint = 24;
-
-  // Variables pour le temps
-  secondes = 38000L; // 12 heures *0.88
+  Setpoint = 45;
 
   //turn the PID on
   myPID.SetMode(AUTOMATIC);
-
-  temps = 37995;
 
   //tell the PID to range between 0 and the full window size
   myPID.SetOutputLimits(0, WindowSize);
@@ -64,28 +65,26 @@ void loop() {
   { //time to shift the Relay Window
     windowStartTime += WindowSize;
   }
-  if(Output > now - windowStartTime) digitalWrite(plancherChauffant,HIGH);
-  else digitalWrite(plancherChauffant,LOW);
-
-  temps += 1;
-  if (temps < secondes){
-    digitalWrite(soleil,HIGH);
-  }
-  else {
-    digitalWrite(soleil,LOW);
-    if (Setpoint != 18)
-      Setpoint = 18;
-  }
-
-  // La journée est terminée .. on recommence
-  if (temps > jour) {
-    Setpoint = 25;
-    temps = 0;
-  }
+  if(Output > now - windowStartTime) digitalWrite(heater,HIGH);
+  else digitalWrite(heater,LOW);
   
-  Serial.print(Output);
-  Serial.print(","); 
-  Serial.print(t);
+  ++seconds;
+  if(seconds>temps[0] && seconds<temps[1])
+    etape = 0;
+  else if(seconds>temps[1] && seconds<temps[2])
+    etape = 1;
+  else if(seconds>temps[2] && seconds<temps[3])
+    etape = 2;
+  else
+    etape = 3;
+  
+  Setpoint = temperature[etape];
+  
+  Serial.print(seconds);
   Serial.print(",");
-  Serial.println(temps);
+  Serial.print(Setpoint);
+  Serial.print(",");
+  Serial.print(Output);
+  Serial.print(",");  
+  Serial.println(t);
 }
