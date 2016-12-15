@@ -1,7 +1,7 @@
 #include <PID_v1.h>
 
 // 45, then 27, then 31
-int temperatures[4] = {45, 27, 31, 0};
+int temperatures[4] = {50, 27, 31, 0};
 long temps[3] = {1000, 4500, 8000};
  
 #define RTDPIN A0     // what pin we're connected to
@@ -12,12 +12,12 @@ long temps[3] = {1000, 4500, 8000};
 double Setpoint, Input, Output;
 
 //Specify the links and initial tuning parameters
-PID myPID(&Input, &Output, &Setpoint,250,5,1, DIRECT);
+PID myPID(&Input, &Output, &Setpoint,50,0.5,1, DIRECT);
 
 int WindowSize = 5000;
 unsigned long windowStartTime;
 long seconds = 990;
-int etape = 2;
+int etape = 0;
 float resConnue = 99.1;
 
 float in[] = { 100.00, 100.39, 100.78, 101.17, 101.56, 101.95, 102.34, 102.73, 103.12, 103.51,
@@ -99,14 +99,10 @@ void loop() {
   else digitalWrite(heater,LOW);
   
   ++seconds;
-  if(seconds>=0 && seconds<temps[0])
-    etape = 0;
-  else if(seconds>temps[0] && seconds<temps[1])
+  if(c > temperatures[0] && etape == 0)
     etape = 1;
-  else if(seconds>temps[1] && seconds<temps[2])
+  if(c < temperatures[1] && etape == 1)
     etape = 2;
-  else
-    etape = 3;
   
   Setpoint = temperatures[etape];
   
@@ -119,6 +115,6 @@ void loop() {
   Serial.print(Output);
   Serial.print(",");  
   Serial.print(analogRead(A0));
-  Serial.print(",");  
+  Serial.print(", || Température : ");  
   Serial.println(c);
 }
