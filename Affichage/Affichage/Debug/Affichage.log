@@ -1,6 +1,3 @@
-﻿  main.cpp
-c:\users\mfortier\documents\visual studio 2015\projects\affichage\affichage\main.cpp(11): warning C4101: 'actions' : variable locale non référencée
-  affichageLCD.cpp
-  Génération de code en cours...
-  Affichage.vcxproj -> C:\Users\mfortier\documents\visual studio 2015\Projects\Affichage\Debug\Affichage.exe
-  Affichage.vcxproj -> C:\Users\mfortier\documents\visual studio 2015\Projects\Affichage\Debug\Affichage.pdb (Partial PDB)
+﻿  Menu.cpp
+  Affichage.vcxproj -> C:\Users\mfortier\Desktop\growmarc\Affichage\Debug\Affichage.exe
+  Affichage.vcxproj -> C:\Users\mfortier\Desktop\growmarc\Affichage\Debug\Affichage.pdb (Partial PDB)
